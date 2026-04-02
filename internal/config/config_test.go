@@ -56,3 +56,31 @@ rules:
 		t.Fatalf("validate config: %v", err)
 	}
 }
+
+func TestValidateAppliesDefaults(t *testing.T) {
+	t.Parallel()
+
+	cfg := Config{
+		Endpoints: Endpoints{
+			Loki:  "http://localhost:3100",
+			Mimir: "http://localhost:9090",
+			Tempo: "http://localhost:3200",
+		},
+		Scan: Scan{
+			Lookback: "30m",
+		},
+	}
+
+	if err := cfg.Validate(); err != nil {
+		t.Fatalf("Validate: %v", err)
+	}
+	if len(cfg.Rules.LogTrace.RequiredTraceKeys) == 0 {
+		t.Fatal("required trace keys were not defaulted")
+	}
+	if len(cfg.Rules.Labels.RequiredSharedLabels) == 0 {
+		t.Fatal("required shared labels were not defaulted")
+	}
+	if cfg.Rules.Severity.Critical != 40 || cfg.Rules.Severity.High != 60 || cfg.Rules.Severity.Medium != 80 {
+		t.Fatalf("unexpected severity defaults: %+v", cfg.Rules.Severity)
+	}
+}

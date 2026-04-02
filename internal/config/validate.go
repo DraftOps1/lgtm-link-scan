@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (c Config) Validate() error {
+func (c *Config) Validate() error {
 	var problems []error
 
 	if strings.TrimSpace(c.Endpoints.Loki) == "" {
@@ -29,8 +29,14 @@ func (c Config) Validate() error {
 	if c.Rules.LogTrace.MinCoveragePercent < 0 || c.Rules.LogTrace.MinCoveragePercent > 100 {
 		problems = append(problems, errors.New("rules.log_trace.min_coverage_percent must be between 0 and 100"))
 	}
+	if len(c.Rules.LogTrace.RequiredTraceKeys) == 0 {
+		c.Rules.LogTrace.RequiredTraceKeys = []string{"trace_id", "traceid"}
+	}
 	if c.Rules.MetricTrace.MinExemplarCoveragePercent < 0 || c.Rules.MetricTrace.MinExemplarCoveragePercent > 100 {
 		problems = append(problems, errors.New("rules.metric_trace.min_exemplar_coverage_percent must be between 0 and 100"))
+	}
+	if len(c.Rules.Labels.RequiredSharedLabels) == 0 {
+		c.Rules.Labels.RequiredSharedLabels = []string{"service.name", "service.namespace", "deployment.environment"}
 	}
 
 	if c.Rules.Severity.Critical == 0 {
