@@ -1,0 +1,37 @@
+endpoints:
+  loki: http://localhost:3100
+  # The local demo uses the Prometheus-compatible metrics API from grafana/otel-lgtm.
+  mimir: http://localhost:9090
+  tempo: http://localhost:3200
+
+auth:
+  bearer_token: ""
+
+scan:
+  lookback: 30m
+  services:
+    - checkout
+
+rules:
+  log_trace:
+    required_trace_keys: ["trace_id", "traceid"]
+    min_coverage_percent: 80
+
+  metric_trace:
+    min_exemplar_coverage_percent: 50
+
+  trace_metrics:
+    required_metric_names:
+      - calls
+      - duration
+
+  labels:
+    required_shared_labels:
+      - service.name
+      - service.namespace
+      - deployment.environment
+
+  severity:
+    critical: 40
+    high: 60
+    medium: 80

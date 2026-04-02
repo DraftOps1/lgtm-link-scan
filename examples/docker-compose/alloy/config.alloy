@@ -1,0 +1,75 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+otelcol.receiver.otlp "default" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    traces = [
+      otelcol.connector.spanmetrics.default.input,
+      otelcol.exporter.otlphttp.lgtm.input,
+    ]
+  }
+}
+
+otelcol.connector.spanmetrics "default" {
+  histogram {
+    explicit {}
+  }
+
+  output {
+    metrics = [otelcol.exporter.otlphttp.lgtm.input]
+  }
+}
+
+otelcol.exporter.otlphttp "lgtm" {
+  client {
+    endpoint = "http://lgtm:4318"
+  }
+}
+
+prometheus.scrape "demoapp" {
+  targets = [
+    {
+      __address__ = "demoapp:8080",
+      job         = "demoapp",
+    },
+  ]
+  metrics_path      = "/metrics"
+  scrape_protocols  = ["OpenMetricsText1.0.0", "OpenMetricsText0.0.1", "PrometheusText1.0.0", "PrometheusText0.0.4"]
+  forward_to        = [prometheus.remote_write.lgtm.receiver]
+}
+
+prometheus.remote_write "lgtm" {
+  endpoint {
+    url = "http://lgtm:9090/api/v1/write"
+  }
+}
+
+loki.source.file "demoapp" {
+  targets = [
+    {
+      __path__ = "/var/log/demoapp/*.log",
+      job      = "demoapp",
+    },
+  ]
+  forward_to = [loki.write.lgtm.receiver]
+
+  file_match {
+    enabled = true
+  }
+}
+
+loki.write "lgtm" {
+  endpoint {
+    url = "http://lgtm:3100/loki/api/v1/push"
+  }
+}

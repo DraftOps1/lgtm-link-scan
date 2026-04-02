@@ -1,0 +1,8 @@
+bin/
+dist/
+coverage.out
+result.json
+REPORT.md
+examples/docker-compose/.env.local
+
+docs/local/
