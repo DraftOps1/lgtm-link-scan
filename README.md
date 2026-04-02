@@ -27,13 +27,25 @@ The repository is currently centered around two foundations:
 
 The bootstrap already reproduces both broken and healthy cross-signal behavior.
 
-Broken log correlation in `bad` mode:
+Logs in `bad` mode -> logs in `good` mode
 
-![Bad Loki screenshot](docs/assets/screenshots/bad_loki.png)
+<table>
+  <tr>
+    <td><img src="docs/assets/screenshots/bad_loki.png" alt="Bad Loki screenshot"></td>
+    <td align="center"><strong>-&gt;</strong><br>missing trace context</td>
+    <td><img src="docs/assets/screenshots/good_loki.png" alt="Good Loki screenshot"></td>
+  </tr>
+</table>
 
-Healthy metric to trace correlation in `good` mode:
+Metrics in `bad` mode -> metrics in `good` mode
 
-![Good Prometheus screenshot](docs/assets/screenshots/good_prometheus.png)
+<table>
+  <tr>
+    <td><img src="docs/assets/screenshots/bad_prometheus.png" alt="Bad Prometheus screenshot"></td>
+    <td align="center"><strong>-&gt;</strong><br>no exemplars to trace-linked exemplars</td>
+    <td><img src="docs/assets/screenshots/good_prometheus.png" alt="Good Prometheus screenshot"></td>
+  </tr>
+</table>
 
 ## Optional Demo
 
